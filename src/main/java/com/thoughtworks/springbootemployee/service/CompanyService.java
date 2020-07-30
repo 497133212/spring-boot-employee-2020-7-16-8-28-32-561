@@ -3,7 +3,6 @@ package com.thoughtworks.springbootemployee.service;
 import com.thoughtworks.springbootemployee.dao.CompanyRepository;
 import com.thoughtworks.springbootemployee.model.Company;
 import com.thoughtworks.springbootemployee.model.Employee;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -33,29 +32,32 @@ public class CompanyService {
         return company.getEmployees();
     }
 
-    public Page<Company> getAllCompanies(Integer page, Integer pageSize) {
-        return companyRepository.findAll(PageRequest.of(page, pageSize));
+    public List<Company> getAllCompanies(Integer page, Integer pageSize) {
+        if (page == null || pageSize == null) {
+            return companyRepository.findAll();
+        }
+        return companyRepository.findAll(PageRequest.of(page, pageSize)).toList();
     }
 
     public Company addCompany(Company company) {
-        if(company != null) {
+        if (company != null) {
             return companyRepository.save(company);
         }
         return null;
     }
 
     public Company updateCompany(Integer companyId, Company company) {
-        if(company != null && company != null) {
+        if (company != null && company != null) {
             Optional<Company> optionalCompany = companyRepository.findById(companyId);
-            if(optionalCompany.isPresent()) {
+            if (optionalCompany.isPresent()) {
                 Company companyInfo = optionalCompany.get();
-                if(!StringUtils.isEmpty(companyInfo.getCompanyName())) {
+                if (!StringUtils.isEmpty(companyInfo.getCompanyName())) {
                     companyInfo.setCompanyName(company.getCompanyName());
                 }
-                if(!StringUtils.isEmpty(companyInfo.getEmployeesNumber())) {
+                if (!StringUtils.isEmpty(companyInfo.getEmployeesNumber())) {
                     companyInfo.setEmployeesNumber(company.getEmployeesNumber());
                 }
-                if(!StringUtils.isEmpty(companyInfo.getEmployees())) {
+                if (!StringUtils.isEmpty(companyInfo.getEmployees())) {
                     companyInfo.setEmployees(companyInfo.getEmployees());
                 }
                 return companyRepository.save(companyInfo);
@@ -65,9 +67,9 @@ public class CompanyService {
     }
 
     public void deleteEmployeesOfCompanyById(Integer companyId) {
-        if(companyId != null) {
+        if (companyId != null) {
             Optional<Company> optionalCompany = companyRepository.findById(companyId);
-            if(optionalCompany.isPresent()) {
+            if (optionalCompany.isPresent()) {
                 Company company = optionalCompany.get();
                 company.setEmployees(null);
                 companyRepository.save(company);

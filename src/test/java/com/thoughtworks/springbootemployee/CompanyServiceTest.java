@@ -5,7 +5,6 @@ import com.thoughtworks.springbootemployee.model.Company;
 import com.thoughtworks.springbootemployee.model.Employee;
 import com.thoughtworks.springbootemployee.service.CompanyService;
 import org.junit.jupiter.api.Test;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
@@ -13,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.BDDMockito.given;
@@ -71,9 +69,9 @@ public class CompanyServiceTest {
         companies.add(new Company(2, "alibaba2", 100, null));
         given(mockedCompanyRepository.findAll(PageRequest.of(1, 2))).willReturn(new PageImpl<Company>(companies));
         //when
-        Page<Company> actualCompanies = companyService.getAllCompanies(1, 2);
+        List<Company> actualCompanies = companyService.getAllCompanies(1, 2);
         //then
-        assertEquals(new PageImpl<Company>(companies), actualCompanies);
+        assertEquals(companies, actualCompanies);
     }
 
     @Test
@@ -105,7 +103,7 @@ public class CompanyServiceTest {
     void should_delete_all_employees_belong_to_company_when_delete_employees_of_company_by_id_given_company_id() {
         //given
         List<Employee> employees = new ArrayList<>();
-        employees.add(new Employee(1,"ming",10,"male",7000));
+        employees.add(new Employee(1, "ming", 10, "male", 7000));
         Company company = new Company(1, "alibaba", 200, employees);
         given(mockedCompanyRepository.findById(1)).willReturn(Optional.of(company));
         given(mockedCompanyRepository.save(company)).willReturn(company);
