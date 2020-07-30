@@ -36,7 +36,7 @@ public class CompanyController {
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.CREATED)
     public Company addCompany(@RequestBody Company company) {
         return companyService.addCompany(company);
     }
@@ -49,7 +49,7 @@ public class CompanyController {
 
     @DeleteMapping("/{companyId}")
     @ResponseStatus(HttpStatus.OK)
-    public void deleteEmployeesOfCompanyById(@PathVariable Integer companyId) {
-        companyService.deleteEmployeesOfCompanyById(companyId);
+    public void deleteCompanyById(@PathVariable Integer companyId) {
+        companyService.deleteCompanyById(companyId);
     }
 }

@@ -6,29 +6,28 @@ import java.util.List;
 @Entity
 public class Company {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer companyId;
+    private Integer id;
     private String companyName;
     private int employeesNumber;
-    @OneToMany(cascade = CascadeType.ALL,mappedBy = "company",orphanRemoval = true)
+    @OneToMany(cascade = {CascadeType.ALL}, mappedBy = "companyId")
     private List<Employee> employees;
 
     public Company() {
     }
 
-    public Company(int companyId, String companyName, int employeesNumber, List<Employee> employees) {
-        this.companyId = companyId;
+    public Company(int id, String companyName, int employeesNumber, List<Employee> employees) {
+        this.id = id;
         this.companyName = companyName;
         this.employeesNumber = employeesNumber;
         this.employees = employees;
     }
 
-    public int getCompanyId() {
-        return companyId;
+    public int getId() {
+        return id;
     }
 
-    public void setCompanyId(int companyId) {
-        this.companyId = companyId;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getCompanyName() {

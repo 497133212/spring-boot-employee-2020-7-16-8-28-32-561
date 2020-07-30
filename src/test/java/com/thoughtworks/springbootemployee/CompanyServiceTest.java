@@ -42,7 +42,7 @@ public class CompanyServiceTest {
         //when
         Company actualCompany = companyService.getCompanyById(1);
         //then
-        assertEquals(Optional.of(company).get().getCompanyId(), actualCompany.getCompanyId());
+        assertEquals(Optional.of(company).get().getId(), actualCompany.getId());
 
     }
 
@@ -105,11 +105,10 @@ public class CompanyServiceTest {
         List<Employee> employees = new ArrayList<>();
         employees.add(new Employee(1, "ming", 10, "male", 7000));
         Company company = new Company(1, "alibaba", 200, employees);
-        given(mockedCompanyRepository.findById(1)).willReturn(Optional.of(company));
-        given(mockedCompanyRepository.save(company)).willReturn(company);
+//        when(mockedCompanyRepository.deleteById(1));
         //when
-        companyService.deleteEmployeesOfCompanyById(1);
+        companyService.deleteCompanyById(1);
         //then
-        assertNull(company.getEmployees());
+        assertNull(company);
     }
 }

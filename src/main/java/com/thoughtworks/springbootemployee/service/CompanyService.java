@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -40,7 +41,7 @@ public class CompanyService {
     }
 
     public Company addCompany(Company company) {
-        if (company != null) {
+        if (Objects.nonNull(company)) {
             return companyRepository.save(company);
         }
         return null;
@@ -66,14 +67,9 @@ public class CompanyService {
         return null;
     }
 
-    public void deleteEmployeesOfCompanyById(Integer companyId) {
-        if (companyId != null) {
-            Optional<Company> optionalCompany = companyRepository.findById(companyId);
-            if (optionalCompany.isPresent()) {
-                Company company = optionalCompany.get();
-                company.setEmployees(null);
-                companyRepository.save(company);
-            }
+    public void deleteCompanyById(Integer companyId) {
+        if (Objects.nonNull(companyId)) {
+            companyRepository.deleteById(companyId);
         }
     }
 }

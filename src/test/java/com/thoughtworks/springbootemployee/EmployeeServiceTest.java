@@ -70,7 +70,7 @@ public class EmployeeServiceTest {
     @Test
     void should_return_employ_when_add_employee_given_employee() {
         //given
-        Employee employee = new Employee(1, "mandy", 18, "female", 99999);
+        Employee employee = new Employee(1, "mandy", 18, "female", 99999,1);
         given(mockedEmployeeRepository.save(employee)).willReturn(employee);
         //when
         Employee addedEmployee = employeeService.addEmployee(employee);
