@@ -13,7 +13,7 @@ import java.util.Optional;
 @Service
 public class CompanyService {
 
-    CompanyRepository companyRepository;
+    private final CompanyRepository companyRepository;
 
     public CompanyService(CompanyRepository companyRepository) {
         this.companyRepository = companyRepository;
@@ -47,7 +47,7 @@ public class CompanyService {
     }
 
     public Company updateCompany(Integer companyId, Company company) {
-        if (company != null && company != null) {
+        if (company != null) {
             Optional<Company> optionalCompany = companyRepository.findById(companyId);
             if (optionalCompany.isPresent()) {
                 Company companyInfo = optionalCompany.get();
