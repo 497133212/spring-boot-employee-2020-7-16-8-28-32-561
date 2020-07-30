@@ -4,22 +4,21 @@ import com.thoughtworks.springbootemployee.dao.CompanyRepository;
 import com.thoughtworks.springbootemployee.dao.EmployeeRepository;
 import com.thoughtworks.springbootemployee.model.Company;
 import com.thoughtworks.springbootemployee.model.Employee;
-import org.junit.Before;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -51,7 +50,64 @@ public class CompanyIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(10)))
                 .andExpect(jsonPath("$[0].companyId").isNumber())
-                .andExpect(jsonPath("$[0].companyId").value(companies.get(0).getCompanyId()));
+                .andExpect(jsonPath("$[0].companyId").value(companies.get(0).getId()));
+        //then
+    }
+
+    @Test
+    void should_return_employees_when_getAllEmployees_given_() throws Exception {
+        //given
+        List<Company> companies = companyRepository.saveAll(getMockCompanies());
+        Company company = companyRepository.findById(1).orElse(null);
+        List<Employee> employeesRepo = employeeRepository.findAll();
+        List<Company> companieRepo = companyRepository.findAll();
+        List<Employee> employees = company.getEmployees();
+        //when
+        mockMvc.perform(get("/companies/1/employees"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$",hasSize(10)));
+
+        //then
+
+    }
+
+    @Test
+    void should_return_company_when_get_company_by_id_given_company_id() throws Exception {
+        List<Company> companies = companyRepository.saveAll(getMockCompanies());
+        //given
+        mockMvc.perform(get("/companies/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.companyId").value(companies.get(0).getId()))
+                .andExpect(jsonPath("$.employeesNumber").value(companies.get(0).getEmployeesNumber()))
+                .andExpect(jsonPath("$.companyName").value(companies.get(0).getCompanyName()));
+        //when
+
+        //then
+
+    }
+
+    @Test
+    void should_return_company_when_add_company_given_company() throws Exception {
+        //given
+        Company company = new Company(1, "alibaba2", 100 , Collections.emptyList());
+        companyRepository.save(company);
+        mockMvc.perform(post("/companies")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(
+                      "{\n" +
+                              "        \"id\": 1,\n" +
+                              "        \"companyName\": \"alibaba2\",\n" +
+                              "        \"employeesNumber\": 100,\n" +
+                              "        \"employees\": [\n" +
+                              "        ]\n" +
+                              "    }"
+                ))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").value(company.getId()))
+                .andExpect(jsonPath("$.companyName").value(company.getCompanyName()))
+                .andExpect(jsonPath("$.employeesNumber").value(company.getEmployeesNumber()));
+        //when
+
         //then
 
     }
