@@ -1,6 +1,8 @@
 package com.thoughtworks.springbootemployee.service;
 
 import com.thoughtworks.springbootemployee.dao.CompanyRepository;
+import com.thoughtworks.springbootemployee.dto.CompanyRequest;
+import com.thoughtworks.springbootemployee.mapper.CompanyMapper;
 import com.thoughtworks.springbootemployee.model.Company;
 import com.thoughtworks.springbootemployee.model.Employee;
 import org.springframework.data.domain.PageRequest;
@@ -16,8 +18,11 @@ public class CompanyService {
 
     private final CompanyRepository companyRepository;
 
-    public CompanyService(CompanyRepository companyRepository) {
+    private final  CompanyMapper companyMapper;
+
+    public CompanyService(CompanyRepository companyRepository, CompanyMapper companyMapper) {
         this.companyRepository = companyRepository;
+        this.companyMapper = companyMapper;
     }
 
     public List<Company> findAllCompanies() {
@@ -40,14 +45,16 @@ public class CompanyService {
         return companyRepository.findAll(PageRequest.of(page, pageSize)).toList();
     }
 
-    public Company addCompany(Company company) {
+    public Company addCompany(CompanyRequest companyRequest) {
+        Company company = companyMapper.toCompany(companyRequest);
         if (Objects.nonNull(company)) {
             return companyRepository.save(company);
         }
         return null;
     }
 
-    public Company updateCompany(Integer companyId, Company company) {
+    public Company updateCompany(Integer companyId, CompanyRequest companyRequest) {
+        Company company = companyMapper.toCompany(companyRequest);
         if (company != null) {
             Optional<Company> optionalCompany = companyRepository.findById(companyId);
             if (optionalCompany.isPresent()) {
