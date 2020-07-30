@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -148,6 +149,18 @@ public class CompanyIntegrationTest {
         mockMvc.perform(delete("/companies/1")).andExpect(status().isOk());
         //then
         assertEquals(false, companyRepository.findById(1).isPresent());
+    }
+
+    @Test
+    void should_return_company_list_when_get_all_company_after_Pagination_given_page_and_pageSize() throws Exception {
+        //given
+        List<Company> companies = getMockCompanies();
+        companyRepository.saveAll(companies);
+        List<Company> companyList = companyRepository.findAll(PageRequest.of(1, 5)).toList();
+        //when
+        mockMvc.perform(get("/companies?page=1&pageSize=5")).andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(5)));
+
     }
 
     private List<Company> getMockCompanies() {
