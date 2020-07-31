@@ -1,5 +1,7 @@
 package com.thoughtworks.springbootemployee.controller;
 
+import com.thoughtworks.springbootemployee.dto.EmployeeRequest;
+import com.thoughtworks.springbootemployee.dto.EmployeeResponse;
 import com.thoughtworks.springbootemployee.model.Employee;
 import com.thoughtworks.springbootemployee.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,15 +27,15 @@ public class EmployeeController {
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.OK)
-    public Employee addEmployee(@RequestBody Employee employee) {
-        return employeeService.addEmployee(employee);
+    @ResponseStatus(HttpStatus.CREATED)
+    public EmployeeResponse addEmployee(@RequestBody EmployeeRequest employeeRequest) {
+        return employeeService.addEmployee(employeeRequest);
     }
 
     @PutMapping("/{employeeId}")
     @ResponseStatus(HttpStatus.OK)
-    public Employee updateEmployee(@PathVariable int employeeId, @RequestBody Employee employee) {
-        return employeeService.updateEmployee(employeeId, employee);
+    public EmployeeResponse updateEmployee(@PathVariable int employeeId, @RequestBody EmployeeRequest employeeRequest) {
+        return employeeService.updateEmployee(employeeId, employeeRequest);
     }
 
     @DeleteMapping("{employeeId}")

@@ -43,8 +43,6 @@ public class CompanyIntegrationTest {
         companyRepository.deleteAll();
     }
 
-
-
     @Test
     void should_return_companies_when_getAllCompanies_given_request() throws Exception {
         //todo
