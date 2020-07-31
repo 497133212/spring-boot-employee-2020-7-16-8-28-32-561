@@ -10,7 +10,7 @@ public class CompanyMapper {
 
     public Company toCompany(CompanyRequest companyRequest) {
         Company company = new Company();
-        BeanUtils.copyProperties(company, companyRequest);
+        BeanUtils.copyProperties(companyRequest, company);
         return company;
     }
 }

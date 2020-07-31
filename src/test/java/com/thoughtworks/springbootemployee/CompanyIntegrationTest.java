@@ -19,8 +19,7 @@ import java.util.List;
 
 import static org.assertj.core.util.Lists.emptyList;
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -44,8 +43,11 @@ public class CompanyIntegrationTest {
         companyRepository.deleteAll();
     }
 
+
+
     @Test
     void should_return_companies_when_getAllCompanies_given_request() throws Exception {
+        //todo
         //given
         List<Company> companies = companyRepository.saveAll(getMockCompanies());
         //when
@@ -135,8 +137,8 @@ public class CompanyIntegrationTest {
                         "        \"employees\": [\n" +
                         "        ]\n" +
                         "    }"))
-                .andExpect(jsonPath("$.employeesNumber").value(companyRepository.findById(1).get().getEmployeesNumber()))
-                .andExpect(jsonPath("$.companyName").value(companyRepository.findById(1).get().getCompanyName()));
+                .andExpect(jsonPath("$.employeesNumber").value(200))
+                .andExpect(jsonPath("$.companyName").value("alibaba3"));
         //then
     }
 
@@ -148,7 +150,7 @@ public class CompanyIntegrationTest {
         //when
         mockMvc.perform(delete("/companies/1")).andExpect(status().isOk());
         //then
-        assertEquals(false, companyRepository.findById(1).isPresent());
+        assertFalse(companyRepository.findById(1).isPresent());
     }
 
     @Test

@@ -18,7 +18,8 @@ public class CompanyService {
 
     private final CompanyRepository companyRepository;
 
-    private final  CompanyMapper companyMapper;
+    private final CompanyMapper companyMapper;
+
 
     public CompanyService(CompanyRepository companyRepository, CompanyMapper companyMapper) {
         this.companyRepository = companyRepository;
