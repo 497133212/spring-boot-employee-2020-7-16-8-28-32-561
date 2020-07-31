@@ -2,9 +2,12 @@ package com.thoughtworks.springbootemployee.service;
 
 import com.thoughtworks.springbootemployee.dao.CompanyRepository;
 import com.thoughtworks.springbootemployee.dto.CompanyRequest;
+import com.thoughtworks.springbootemployee.exception.IllegalOperationException;
+import com.thoughtworks.springbootemployee.exception.NoSuchDataException;
 import com.thoughtworks.springbootemployee.mapper.CompanyMapper;
 import com.thoughtworks.springbootemployee.model.Company;
 import com.thoughtworks.springbootemployee.model.Employee;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -31,48 +34,65 @@ public class CompanyService {
     }
 
     public Company getCompanyById(int companyId) {
-        return companyRepository.findById(companyId).get();
+
+        Company company = companyRepository.findById(companyId).orElse(null);
+        if (company == null) {
+            throw new NoSuchDataException();
+        }
+        return company;
     }
 
     public List<Employee> getAllEmployeeOfCompany(int companyId) {
-        Company company = companyRepository.findById(companyId).get();
+        Company company = companyRepository.findById(companyId).orElse(null);
+        if (company == null) {
+            throw new NoSuchDataException();
+        }
         return company.getEmployees();
     }
 
-    public List<Company> getAllCompanies(Integer page, Integer pageSize) {
-        if (page == null || pageSize == null) {
-            return companyRepository.findAll();
-        }
-        return companyRepository.findAll(PageRequest.of(page, pageSize)).toList();
+    public List<Company> getAllCompanies() {
+
+        return companyRepository.findAll();
+    }
+
+    public Page<Company> getAllCompanies(Integer page, Integer pageSize) {
+
+        return companyRepository.findAll(PageRequest.of(page - 1, pageSize));
     }
 
     public Company addCompany(CompanyRequest companyRequest) {
         Company company = companyMapper.toCompany(companyRequest);
-        if (Objects.nonNull(company)) {
-            return companyRepository.save(company);
-        }
-        return null;
+        checkCompanyModel(company);
+
+        return companyRepository.save(company);
     }
 
     public Company updateCompany(Integer companyId, CompanyRequest companyRequest) {
         Company company = companyMapper.toCompany(companyRequest);
-        if (company != null) {
-            Optional<Company> optionalCompany = companyRepository.findById(companyId);
-            if (optionalCompany.isPresent()) {
-                Company companyInfo = optionalCompany.get();
-                if (!StringUtils.isEmpty(companyInfo.getCompanyName())) {
-                    companyInfo.setCompanyName(company.getCompanyName());
-                }
-                if (!StringUtils.isEmpty(companyInfo.getEmployeesNumber())) {
-                    companyInfo.setEmployeesNumber(company.getEmployeesNumber());
-                }
-                if (!StringUtils.isEmpty(companyInfo.getEmployees())) {
-                    companyInfo.setEmployees(companyInfo.getEmployees());
-                }
-                return companyRepository.save(companyInfo);
-            }
+        checkCompanyModel(company);
+        Optional<Company> optionalCompany = companyRepository.findById(companyId);
+        if (!optionalCompany.isPresent()) {
+            throw new NoSuchDataException();
         }
-        return null;
+
+        Company companyInfo = optionalCompany.get();
+        if (!StringUtils.isEmpty(companyInfo.getCompanyName())) {
+            companyInfo.setCompanyName(company.getCompanyName());
+        }
+        if (!StringUtils.isEmpty(companyInfo.getEmployeesNumber())) {
+            companyInfo.setEmployeesNumber(company.getEmployeesNumber());
+        }
+        if (!StringUtils.isEmpty(companyInfo.getEmployees())) {
+            companyInfo.setEmployees(companyInfo.getEmployees());
+        }
+        return companyRepository.save(companyInfo);
+
+    }
+
+    private void checkCompanyModel(Company company) {
+        if (Objects.isNull(company)) {
+            throw new IllegalOperationException();
+        }
     }
 
     public void deleteCompanyById(Integer companyId) {

@@ -70,7 +70,7 @@ public class CompanyServiceTest {
         companies.add(new Company(2, "alibaba2", 100, null));
         given(mockedCompanyRepository.findAll(PageRequest.of(1, 2))).willReturn(new PageImpl<Company>(companies));
         //when
-        List<Company> actualCompanies = companyService.getAllCompanies(1, 2);
+        List<Company> actualCompanies = companyService.getAllCompanies(1, 2).toList();
         //then
         assertEquals(companies, actualCompanies);
     }

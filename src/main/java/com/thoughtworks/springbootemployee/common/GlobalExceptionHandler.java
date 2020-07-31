@@ -21,4 +21,8 @@ public class GlobalExceptionHandler {
     String handleIllegalOperationException() {
         return ExceptionMessage.ILLEGALOPRATION.getErrorMsg();
     }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.NOT_EXTENDED)
+    String handleIllegalArgumentException() {return  ExceptionMessage.IllegalArgumentException.getErrorMsg();}
 }
