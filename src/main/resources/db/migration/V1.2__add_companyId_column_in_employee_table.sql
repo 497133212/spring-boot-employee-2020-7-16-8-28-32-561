@@ -1,1 +1,1 @@
-alter table employee add column companyId INTEGER
+alter table employee add column company_id INTEGER

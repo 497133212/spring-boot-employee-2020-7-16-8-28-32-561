@@ -2,6 +2,7 @@ package com.thoughtworks.springbootemployee.service;
 
 import com.thoughtworks.springbootemployee.dao.CompanyRepository;
 import com.thoughtworks.springbootemployee.dto.CompanyRequest;
+import com.thoughtworks.springbootemployee.dto.CompanyResponse;
 import com.thoughtworks.springbootemployee.mapper.CompanyMapper;
 import com.thoughtworks.springbootemployee.model.Company;
 import com.thoughtworks.springbootemployee.model.Employee;
@@ -30,8 +31,8 @@ public class CompanyService {
         return companyRepository.findAll();
     }
 
-    public Company getCompanyById(int companyId) {
-        return companyRepository.findById(companyId).get();
+    public CompanyResponse getCompanyById(int companyId) {
+        return companyMapper.toCompanyResponse(companyRepository.findById(companyId).get());
     }
 
     public List<Employee> getAllEmployeeOfCompany(int companyId) {
@@ -46,15 +47,15 @@ public class CompanyService {
         return companyRepository.findAll(PageRequest.of(page, pageSize)).toList();
     }
 
-    public Company addCompany(CompanyRequest companyRequest) {
+    public CompanyResponse addCompany(CompanyRequest companyRequest) {
         Company company = companyMapper.toCompany(companyRequest);
         if (Objects.nonNull(company)) {
-            return companyRepository.save(company);
+            return companyMapper.toCompanyResponse(companyRepository.save(company));
         }
         return null;
     }
 
-    public Company updateCompany(Integer companyId, CompanyRequest companyRequest) {
+    public CompanyResponse updateCompany(Integer companyId, CompanyRequest companyRequest) {
         Company company = companyMapper.toCompany(companyRequest);
         if (company != null) {
             Optional<Company> optionalCompany = companyRepository.findById(companyId);
@@ -69,7 +70,7 @@ public class CompanyService {
                 if (!StringUtils.isEmpty(companyInfo.getEmployees())) {
                     companyInfo.setEmployees(companyInfo.getEmployees());
                 }
-                return companyRepository.save(companyInfo);
+                return companyMapper.toCompanyResponse(companyRepository.save(companyInfo));
             }
         }
         return null;

@@ -1,5 +1,5 @@
 create table company(
     id INTEGER AUTO_INCREMENT PRIMARY KEY,
-    companyName VARCHAR(255),
-    employeesNumber INT
+    company_name VARCHAR(255),
+    employees_number INT
 )
