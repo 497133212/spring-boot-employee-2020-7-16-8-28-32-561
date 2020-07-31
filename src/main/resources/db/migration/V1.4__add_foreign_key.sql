@@ -1,0 +1,1 @@
+alter table employee add constraint `fk` foreign key (`companyId`) references company(`id`)
