@@ -4,7 +4,6 @@ import com.thoughtworks.springbootemployee.dao.CompanyRepository;
 import com.thoughtworks.springbootemployee.dto.CompanyResponse;
 import com.thoughtworks.springbootemployee.dto.EmployeeResponse;
 import com.thoughtworks.springbootemployee.mapper.CompanyMapper;
-import com.thoughtworks.springbootemployee.mapper.EmployeeMapper;
 import com.thoughtworks.springbootemployee.model.Company;
 import com.thoughtworks.springbootemployee.model.Employee;
 import com.thoughtworks.springbootemployee.service.CompanyService;
@@ -23,18 +22,12 @@ import static org.mockito.Mockito.mock;
 
 public class CompanyServiceTest {
     CompanyRepository mockedCompanyRepository = mock(CompanyRepository.class);
-    CompanyMapper companyMapper = new CompanyMapper();
-    EmployeeMapper employeeMapper = new EmployeeMapper();
-    CompanyService companyService = new CompanyService(mockedCompanyRepository, companyMapper, employeeMapper);
-
+    CompanyService companyService = new CompanyService(mockedCompanyRepository);
 
     @Test
     void should_return_company_list_when_getAllCompanies() {
         //when
-        List<Company> companies = new ArrayList<>();
-        companies.add(new Company(1, "alibaba", 100, null));
-        companies.add(new Company(2, "alibaba", 100, null));
-        given(mockedCompanyRepository.findAll()).willReturn(companies);
+        given(mockedCompanyRepository.findAll()).willReturn(getMockCompanyData());
         List<CompanyResponse> actualCompanies = companyService.getAllCompanies();
         //then
         assertEquals(2, actualCompanies.size());
@@ -117,5 +110,12 @@ public class CompanyServiceTest {
         companyService.deleteCompanyById(1);
         //then
         assertNull(company);
+    }
+
+    private List<Company> getMockCompanyData(){
+        List<Company> companies = new ArrayList<>();
+        companies.add(new Company(1, "alibaba", 100, null));
+        companies.add(new Company(2, "oocl", 100, null));
+        return companies;
     }
 }

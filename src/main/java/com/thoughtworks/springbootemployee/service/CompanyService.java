@@ -20,25 +20,25 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import static com.thoughtworks.springbootemployee.mapper.CompanyMapper.toCompany;
+import static com.thoughtworks.springbootemployee.mapper.CompanyMapper.toCompanyResponse;
+import static com.thoughtworks.springbootemployee.mapper.EmployeeMapper.toEmployeeResponse;
+
 @Service
 public class CompanyService {
 
     private final CompanyRepository companyRepository;
 
-    private final CompanyMapper companyMapper;
 
-    private EmployeeMapper employeeMapper;
 
-    public CompanyService(CompanyRepository companyRepository, CompanyMapper companyMapper, EmployeeMapper employeeMapper) {
+    public CompanyService(CompanyRepository companyRepository) {
         this.companyRepository = companyRepository;
-        this.companyMapper = companyMapper;
-        this.employeeMapper = employeeMapper;
     }
 
     public List<CompanyResponse> getAllCompanies() {
         List<Company> companies = companyRepository.findAll();
         List<CompanyResponse> companyResponses = new ArrayList<>();
-        companies.forEach(company -> companyResponses.add(companyMapper.toCompanyResponse(company)));
+        companies.forEach(company -> companyResponses.add(toCompanyResponse(company)));
         return companyResponses;
     }
 
@@ -51,7 +51,7 @@ public class CompanyService {
         if (company == null) {
             throw new NoSuchDataException();
         }
-        return companyMapper.toCompanyResponse(company);
+        return toCompanyResponse(company);
     }
 
     public List<EmployeeResponse> getAllEmployeeOfCompany(int companyId) {
@@ -60,20 +60,20 @@ public class CompanyService {
             throw new NoSuchDataException();
         }
         List<EmployeeResponse> employeeResponses = new ArrayList<>();
-        company.getEmployees().forEach(employee -> employeeResponses.add(employeeMapper.toEmployeeResponse(employee)));
+        company.getEmployees().forEach(employee -> employeeResponses.add(toEmployeeResponse(employee)));
         return employeeResponses;
     }
 
 
     public CompanyResponse addCompany(CompanyRequest companyRequest) {
-        Company company = companyMapper.toCompany(companyRequest);
+        Company company = toCompany(companyRequest);
         checkCompanyModel(company);
 
-        return companyMapper.toCompanyResponse(companyRepository.save(company));
+        return toCompanyResponse(companyRepository.save(company));
     }
 
     public CompanyResponse updateCompany(Integer companyId, CompanyRequest companyRequest) {
-        Company company = companyMapper.toCompany(companyRequest);
+        Company company = toCompany(companyRequest);
         checkCompanyModel(company);
         Optional<Company> optionalCompany = companyRepository.findById(companyId);
         if (!optionalCompany.isPresent()) {
@@ -90,7 +90,7 @@ public class CompanyService {
         if (!StringUtils.isEmpty(companyInfo.getEmployees())) {
             companyInfo.setEmployees(companyInfo.getEmployees());
         }
-        return companyMapper.toCompanyResponse(companyRepository.save(company));
+        return toCompanyResponse(companyRepository.save(company));
 
     }
 

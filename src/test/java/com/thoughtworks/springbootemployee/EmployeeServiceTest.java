@@ -3,7 +3,6 @@ package com.thoughtworks.springbootemployee;
 import com.thoughtworks.springbootemployee.dao.EmployeeRepository;
 import com.thoughtworks.springbootemployee.dto.EmployeeRequest;
 import com.thoughtworks.springbootemployee.dto.EmployeeResponse;
-import com.thoughtworks.springbootemployee.mapper.EmployeeMapper;
 import com.thoughtworks.springbootemployee.model.Employee;
 import com.thoughtworks.springbootemployee.service.EmployeeService;
 import org.junit.jupiter.api.Test;
@@ -21,8 +20,7 @@ import static org.mockito.Mockito.*;
 
 public class EmployeeServiceTest {
     EmployeeRepository mockedEmployeeRepository = mock(EmployeeRepository.class);
-    EmployeeMapper employeeMapper = new EmployeeMapper();
-    EmployeeService employeeService = new EmployeeService(mockedEmployeeRepository,employeeMapper);
+    EmployeeService employeeService = new EmployeeService(mockedEmployeeRepository );
 
     @Test
     void should_return_employees_list_when_getAllEmployees() {
