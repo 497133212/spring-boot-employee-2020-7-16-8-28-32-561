@@ -8,30 +8,32 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import static com.thoughtworks.springbootemployee.common.JsonResult.*;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(NoSuchDataException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    String handleNoSuchDataException() {
-        return ExceptionMessage.NO_SUCH_DATA.getErrorMsg();
+    JsonResult handleNoSuchDataException() {
+        return http404();
     }
 
     @ExceptionHandler(IllegalOperationException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    String handleIllegalOperationException() {
-        return ExceptionMessage.ILLEGAL_OPERATION.getErrorMsg();
+    JsonResult handleIllegalOperationException() {
+        return http403();
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.NOT_EXTENDED)
-    String handleIllegalArgumentException() {
-        return ExceptionMessage.IllegalArgumentException.getErrorMsg();
+    JsonResult handleIllegalArgumentException() {
+        return http400();
     }
 
     @ExceptionHandler(BeansException.class)
     @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
-    String handleTransBeansException() {
-        return HttpStatus.SERVICE_UNAVAILABLE.getReasonPhrase();
+    JsonResult handleTransBeansException() {
+        return http503();
     }
 }

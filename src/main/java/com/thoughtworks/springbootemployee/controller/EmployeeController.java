@@ -1,15 +1,13 @@
 package com.thoughtworks.springbootemployee.controller;
 
+import com.thoughtworks.springbootemployee.common.JsonResult;
 import com.thoughtworks.springbootemployee.dto.EmployeeRequest;
-import com.thoughtworks.springbootemployee.dto.EmployeeResponse;
-import com.thoughtworks.springbootemployee.model.Employee;
 import com.thoughtworks.springbootemployee.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import static com.thoughtworks.springbootemployee.common.JsonResult.success;
 
 @RestController
 @RequestMapping("/employees")
@@ -18,36 +16,36 @@ public class EmployeeController {
     EmployeeService employeeService;
 
     @GetMapping
-    public List<EmployeeResponse> getEmployees() {
-        return employeeService.getAllEmployees();
+    public JsonResult getEmployees() {
+        return success(employeeService.getAllEmployees());
     }
 
     @GetMapping(params = {"page", "pageSize"})
-    public Page<Employee> getEmployees(@RequestParam int page, @RequestParam int pageSize) {
-        return employeeService.getPageEmployees(page, pageSize);
+    public JsonResult getEmployees(@RequestParam int page, @RequestParam int pageSize) {
+        return success(employeeService.getPageEmployees(page, pageSize));
     }
 
     @GetMapping(params = {"gender"})
-    public List<EmployeeResponse> getEmployees(@RequestParam String gender) {
-        return employeeService.getEmployeesByGender(gender);
+    public JsonResult getEmployees(@RequestParam String gender) {
+        return success(employeeService.getEmployeesByGender(gender));
     }
 
     @GetMapping("/{employeeId}")
     @ResponseStatus(HttpStatus.OK)
-    public EmployeeResponse getEmployeeById(@PathVariable int employeeId) {
-        return employeeService.getEmployeeById(employeeId);
+    public JsonResult getEmployeeById(@PathVariable int employeeId) {
+        return success(employeeService.getEmployeeById(employeeId));
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public EmployeeResponse addEmployee(@RequestBody EmployeeRequest employeeRequest) {
-        return employeeService.addEmployee(employeeRequest);
+    public JsonResult addEmployee(@RequestBody EmployeeRequest employeeRequest) {
+        return success(employeeService.addEmployee(employeeRequest));
     }
 
     @PutMapping("/{employeeId}")
     @ResponseStatus(HttpStatus.OK)
-    public EmployeeResponse updateEmployee(@PathVariable int employeeId, @RequestBody EmployeeRequest employeeRequest) {
-        return employeeService.updateEmployee(employeeId, employeeRequest);
+    public JsonResult updateEmployee(@PathVariable int employeeId, @RequestBody EmployeeRequest employeeRequest) {
+        return success(employeeService.updateEmployee(employeeId, employeeRequest));
     }
 
     @DeleteMapping("{employeeId}")
