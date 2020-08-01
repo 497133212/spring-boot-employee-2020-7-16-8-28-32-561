@@ -1,9 +1,11 @@
 package com.thoughtworks.springbootemployee;
 
 import com.thoughtworks.springbootemployee.dao.CompanyRepository;
+import com.thoughtworks.springbootemployee.dto.CompanyRequest;
 import com.thoughtworks.springbootemployee.dto.CompanyResponse;
 import com.thoughtworks.springbootemployee.dto.EmployeeResponse;
-import com.thoughtworks.springbootemployee.mapper.CompanyMapper;
+import com.thoughtworks.springbootemployee.exception.IllegalOperationException;
+import com.thoughtworks.springbootemployee.exception.NoSuchDataException;
 import com.thoughtworks.springbootemployee.model.Company;
 import com.thoughtworks.springbootemployee.model.Employee;
 import com.thoughtworks.springbootemployee.service.CompanyService;
@@ -16,9 +18,12 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 public class CompanyServiceTest {
     CompanyRepository mockedCompanyRepository = mock(CompanyRepository.class);
@@ -27,7 +32,7 @@ public class CompanyServiceTest {
     @Test
     void should_return_company_list_when_getAllCompanies() {
         //when
-        given(mockedCompanyRepository.findAll()).willReturn(getMockCompanyData());
+        given(mockedCompanyRepository.findAll()).willReturn(getMockCompanyListData());
         List<CompanyResponse> actualCompanies = companyService.getAllCompanies();
         //then
         assertEquals(2, actualCompanies.size());
@@ -38,84 +43,116 @@ public class CompanyServiceTest {
         //given
         Company company = new Company(1, "alibaba", 100, null);
         given(mockedCompanyRepository.findById(1)).willReturn(Optional.of(company));
-
         //when
         CompanyResponse actualCompany = companyService.getCompanyById(1);
         //then
-        assertEquals(Optional.of(company).get().getId(), actualCompany.getId());
+        assertEquals(company.getId(), actualCompany.getId());
+    }
 
+    @Test
+    void should_throw_exception_when_get_company_by_id_given_company_id_inexistence() {
+        //given
+        given(mockedCompanyRepository.findById(100)).willReturn(Optional.ofNullable(null));
+        //when
+        //then
+        assertThrows(NoSuchDataException.class, () -> companyService.getCompanyById(100));
     }
 
     @Test
     void should_return_all_employee_of_company_when_get_all_employee_given_company_id() {
         //given
-        List<Employee> employees = new ArrayList<>();
-        employees.add(new Employee(1, "alibaba1", 20, "male", 6000));
-        employees.add(new Employee(2, "alibaba2", 20, "female", 6000));
-        Company company = new Company(1, "alibaba", 100, employees);
-        given(mockedCompanyRepository.findById(1)).willReturn(Optional.of(company));
+        given(mockedCompanyRepository.findById(1)).willReturn(Optional.of(getMockCompanyData()));
         //when
-        List<EmployeeResponse> actualEmployees = companyService.getAllEmployeeOfCompany(1);
+        List<EmployeeResponse> actualEmployees = companyService.getAllEmployeeByCompanyId(1);
         //then
-        assertEquals(company.getEmployees(), actualEmployees);
+        assertEquals(getMockCompanyData().getEmployees().size(), actualEmployees.size());
+    }
 
+    @Test
+    void should_throw_exception_when_get_all_employee_given_company_id_inexistence() {
+        //given
+        given(mockedCompanyRepository.findById(1)).willReturn(Optional.ofNullable(null));
+        //when
+        //then
+        assertThrows(NoSuchDataException.class, () -> companyService.getAllEmployeeByCompanyId(1));
     }
 
     @Test
     void should_return_company_list_when_getAllCompanies_given_page_and_pageSize() {
         //given
-        List<Company> companies = new ArrayList<>();
-        companies.add(new Company(1, "alibaba1", 100, null));
-        companies.add(new Company(2, "alibaba2", 100, null));
-        given(mockedCompanyRepository.findAll(PageRequest.of(1, 2))).willReturn(new PageImpl<Company>(companies));
+        given(mockedCompanyRepository.findAll(isA(PageRequest.class))).willReturn(new PageImpl<Company>(getMockCompanyListData()));
         //when
         List<Company> actualCompanies = companyService.getAllCompanies(1, 2).toList();
         //then
-        assertEquals(companies, actualCompanies);
+        assertEquals(getMockCompanyListData().size(), actualCompanies.size());
     }
 
     @Test
     void should_return_company_when_add_company_given_company() {
-//        //given
-//        Company company = new Company(1, "alibaba", 200, null);
-//        given(mockedCompanyRepository.save(company)).willReturn(company);
-//        //when
-//        Company actualCompany = companyService.addCompany(company);
-//
-//        //then
-//        assertEquals(company.getCompanyName(), actualCompany.getCompanyName());
+        //given
+        CompanyRequest companyRequest = new CompanyRequest(1, "alibaba", 200, null);
+        given(mockedCompanyRepository.save(isA(Company.class))).willReturn(new Company(1, "alibaba", 200, null));
+        //when
+        CompanyResponse actualCompanyResponse = companyService.addCompany(companyRequest);
+        //then
+        assertEquals("alibaba", actualCompanyResponse.getCompanyName());
     }
 
     @Test
     void should_return_company_when_update_company_given_company_Id_and_company() {
-//        //given
-//        Company company = new Company(1, "alibaba", 200, null);
-//        Company updateCompany = new Company(1, "xiaomi", 100, null);
-//        given(mockedCompanyRepository.findById(1)).willReturn(Optional.of(company));
-//        given(mockedCompanyRepository.save(updateCompany)).willReturn(updateCompany);
-//        //when
-//        companyService.updateCompany(1, updateCompany);
-//        //then
-//        assertEquals(company.getCompanyName(), updateCompany.getCompanyName());
+        //given
+        Company company = new Company(1, "alibaba", 200, null);
+        CompanyRequest updateCompany = new CompanyRequest(1, "xiaomi", 100, null);
+        Company updatedCompany = new Company(1, "xiaomi", 100, null);
+        given(mockedCompanyRepository.findById(1)).willReturn(Optional.of(company));
+        given(mockedCompanyRepository.save(isA(Company.class))).willReturn(updatedCompany);
+        //when
+        CompanyResponse actualCompany = companyService.updateCompany(1, updateCompany);
+        //then
+        verify(mockedCompanyRepository).save(isA(Company.class));
+        assertEquals(updateCompany.getCompanyName(), actualCompany.getCompanyName());
+    }
+
+    @Test
+    void should_throw_no_such_data_exception_when_update_company_given_company_Id_and_company() {
+        //given
+        CompanyRequest updateCompany = new CompanyRequest(1, "xiaomi", 100, null);
+        given(mockedCompanyRepository.findById(1)).willReturn(Optional.ofNullable(null));
+        //when
+        //then
+        assertThrows(NoSuchDataException.class, () -> companyService.updateCompany(1, updateCompany));
+    }
+
+    @Test
+    void should_throw_illegal_exception_update_company_given_company_Id_and_company_no_equal() {
+        //given
+        Company company = new Company(1, "alibaba", 200, null);
+        CompanyRequest updateCompany = new CompanyRequest(2, "xiaomi", 100, null);
+        //when
+        assertThrows(IllegalOperationException.class, () -> companyService.updateCompany(1, updateCompany));
     }
 
     @Test
     void should_delete_all_employees_belong_to_company_when_delete_employees_of_company_by_id_given_company_id() {
         //given
-        List<Employee> employees = new ArrayList<>();
-        employees.add(new Employee(1, "ming", 10, "male", 7000));
-        Company company = new Company(1, "alibaba", 200, employees);
-//        when(mockedCompanyRepository.deleteById(1));
         //when
         companyService.deleteCompanyById(1);
         //then
-        assertNull(company);
+        verify(mockedCompanyRepository).deleteById(eq(1));
     }
 
-    private List<Company> getMockCompanyData(){
+    private List<Company> getMockCompanyListData() {
         List<Company> companies = new ArrayList<>();
         companies.add(new Company(1, "alibaba", 100, null));
         companies.add(new Company(2, "oocl", 100, null));
         return companies;
+    }
+
+    private Company getMockCompanyData() {
+        List<Employee> employees = new ArrayList<>();
+        employees.add(new Employee(1, "alibaba1", 20, "male", 6000));
+        employees.add(new Employee(2, "alibaba2", 20, "female", 6000));
+        Company company = new Company(1, "alibaba", 100, employees);
+        return company;
     }
 }

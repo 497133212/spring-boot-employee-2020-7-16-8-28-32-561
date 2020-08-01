@@ -4,13 +4,14 @@ import com.thoughtworks.springbootemployee.dao.EmployeeRepository;
 import com.thoughtworks.springbootemployee.dto.EmployeeRequest;
 import com.thoughtworks.springbootemployee.dto.EmployeeResponse;
 import com.thoughtworks.springbootemployee.exception.NoSuchDataException;
+import com.thoughtworks.springbootemployee.mapper.EmployeeMapper;
 import com.thoughtworks.springbootemployee.model.Employee;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.thoughtworks.springbootemployee.mapper.EmployeeMapper.toEmployee;
 import static com.thoughtworks.springbootemployee.mapper.EmployeeMapper.toEmployeeResponse;
@@ -25,19 +26,15 @@ public class EmployeeService {
     }
 
     public EmployeeResponse getEmployeeById(int employeeId) {
-        Employee employee = employeeRepository.findById(employeeId).orElse(null);
-        checkEmployeeModel(employee);
-        return toEmployeeResponse(employee);
+        return toEmployeeResponse(employeeRepository.findById(employeeId).orElseThrow(NoSuchDataException::new));
     }
 
     public EmployeeResponse addEmployee(EmployeeRequest employeeRequest) {
-        Employee employee = toEmployee(employeeRequest);
-        return toEmployeeResponse(employeeRepository.save(employee));
+        return toEmployeeResponse(employeeRepository.save(toEmployee(employeeRequest)));
     }
 
     public EmployeeResponse updateEmployee(int employeeId, EmployeeRequest employeeRequest) {
-        Employee employee = employeeRepository.findById(employeeId).orElse(null);
-        checkEmployeeModel(employee);
+        Employee employee = employeeRepository.findById(employeeId).orElseThrow(NoSuchDataException::new);
         employee.setAge(employeeRequest.getAge());
         employee.setGender(employeeRequest.getGender());
         employee.setName(employeeRequest.getName());
@@ -50,26 +47,21 @@ public class EmployeeService {
     }
 
     public List<EmployeeResponse> getAllEmployees() {
-        List<Employee> employees = employeeRepository.findAll();
-        List<EmployeeResponse> employeeResponses = new ArrayList<>();
-        employees.forEach(employee -> employeeResponses.add(toEmployeeResponse(employee)));
-        return employeeResponses;
+
+        return employeeRepository.findAll().stream()
+                .map(EmployeeMapper::toEmployeeResponse)
+                .collect(Collectors.toList());
     }
 
     public List<EmployeeResponse> getEmployeesByGender(String gender) {
-        List<Employee> employees = employeeRepository.findAllByGender(gender);
-        List<EmployeeResponse> employeeResponses = new ArrayList<>();
-        employees.forEach(employee -> employeeResponses.add(toEmployeeResponse(employee)));
-        return employeeResponses;
+
+        return employeeRepository.findAllByGender(gender).stream()
+                .map(EmployeeMapper::toEmployeeResponse)
+                .collect(Collectors.toList());
     }
 
     public Page<Employee> getPageEmployees(int page, int pageSize) {
         return employeeRepository.findAll(PageRequest.of(page, pageSize));
     }
 
-    private void checkEmployeeModel(Employee employee) {
-        if (employee == null) {
-            throw new NoSuchDataException();
-        }
-    }
 }

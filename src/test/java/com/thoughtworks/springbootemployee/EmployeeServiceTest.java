@@ -20,23 +20,21 @@ import static org.mockito.Mockito.*;
 
 public class EmployeeServiceTest {
     EmployeeRepository mockedEmployeeRepository = mock(EmployeeRepository.class);
-    EmployeeService employeeService = new EmployeeService(mockedEmployeeRepository );
+    EmployeeService employeeService = new EmployeeService(mockedEmployeeRepository);
 
     @Test
     void should_return_employees_list_when_getAllEmployees() {
         //when
-        List<Employee> employees = new ArrayList<>();
-        employees.add(new Employee(1, "mandy", 18, "female",99999));
-        employees.add(new Employee(2, "Austin", 18, "male",99999));
-        given(mockedEmployeeRepository.findAll()).willReturn(employees);
+        given(mockedEmployeeRepository.findAll()).willReturn(getMockEmployeeListData());
         List<EmployeeResponse> actualEmployees = employeeService.getAllEmployees();
         //then
-        assertEquals(2, actualEmployees.size());
+        assertEquals(3, actualEmployees.size());
     }
+
     @Test
     void should_return_employee_when_get_employ_by_id_given_employee_id() {
         //given
-        Employee employee = new Employee(1, "mandy", 18, "female",99999);
+        Employee employee = new Employee(1, "mandy", 18, "female", 99999);
         given(mockedEmployeeRepository.findById(1)).willReturn(Optional.of(employee));
         //when
         EmployeeResponse actualEmploy = employeeService.getEmployeeById(1);
@@ -56,51 +54,62 @@ public class EmployeeServiceTest {
         //then
         assertEquals(new PageImpl<Employee>(employees), actualEmployees);
     }
+
     @Test
     void should_return_all_male_employees_when_getAllEmployees_given_gender_is_male() {
         //given
-        List<Employee> employees = new ArrayList<>();
-        employees.add(new Employee(1, "mandy", 18, "female", 99999));
-        employees.add(new Employee(2, "Austin", 18, "male", 99999));
-        employees.add(new Employee(3, "other", 18, "male", 99999));
-        given(mockedEmployeeRepository.findAllByGender("male")).willReturn(employees);
+        given(mockedEmployeeRepository.findAllByGender("male")).willReturn(getMockEmployeeListData());
         //when
         List<EmployeeResponse> actualEmployees = employeeService.getEmployeesByGender("male");
         //then
-        assertEquals(employees, actualEmployees);
+        assertEquals(getMockEmployeeListData().size(), actualEmployees.size());
     }
+
     @Test
     void should_return_employ_when_add_employee_given_employee() {
         //given
-        Employee employee = new Employee(1, "mandy", 18, "female", 99999,1);
-        EmployeeRequest request = new EmployeeRequest(1, "mandy", 18, "female", 99999,1);
-        given(mockedEmployeeRepository.save(employee)).willReturn(employee);
+        Employee employee = new Employee(1, "mandy", 18, "female", 99999, 1);
+        EmployeeRequest request = new EmployeeRequest(1, "mandy", 18, "female", 99999, 1);
+        given(mockedEmployeeRepository.save(isA(Employee.class))).willReturn(employee);
         //when
-        EmployeeResponse addedEmployee = employeeService.addEmployee(request);
+        EmployeeResponse actualEmployee = employeeService.addEmployee(request);
         //then
-        assertEquals(employee, addedEmployee);
+        assertEquals(employee.getId(), actualEmployee.getId());
     }
+
     @Test
     void should_return_employee_when_update_employee_given_employee() {
         //given
         Employee employee = new Employee(1, "mandy", 18, "female", 66666);
-        Employee updateEmployee = new Employee(1, "mandy", 18, "female", 66666);
-        EmployeeRequest employeeRequest = new EmployeeRequest(1, "mandy", 18, "female", 66666);
-        given(mockedEmployeeRepository.findById(1)).willReturn(Optional.of(employee));
-        given(mockedEmployeeRepository.save(updateEmployee)).willReturn(updateEmployee);
+        Employee updateEmployee = new Employee(1, "mandy", 19, "female", 66666);
+        EmployeeRequest employeeRequest = new EmployeeRequest(1, "mandy", 19, "female", 66666);
+        given(mockedEmployeeRepository.findById(eq(1))).willReturn(Optional.of(employee));
+        given(mockedEmployeeRepository.save(isA(Employee.class))).willReturn(updateEmployee);
         //when
-        employeeService.updateEmployee(1, employeeRequest);
+        EmployeeResponse actualEmployee = employeeService.updateEmployee(1, employeeRequest);
         //the
-        assertEquals(employee.getId(), updateEmployee.getId());
+        assertEquals(updateEmployee.getAge(), actualEmployee.getAge());
     }
+
     @Test
     void should_return_nothing_when_delete_employee_given_employeeId() {
         //given
-        Employee employee = new Employee(1, "mandy", 18, "female", 66666);
-        given(mockedEmployeeRepository.findById(1)).willReturn(Optional.of(employee));
+        given(mockedEmployeeRepository.findById(1)).willReturn(Optional.of(getMockEmployeeData()));
         //when
         employeeService.deleteEmployeeById(1);
         //then
-        verify(mockedEmployeeRepository,times(1)).deleteById(1);
+        verify(mockedEmployeeRepository).deleteById(1);
+    }
+
+    private List<Employee> getMockEmployeeListData() {
+        List<Employee> employees = new ArrayList<>();
+        employees.add(new Employee(1, "mandy", 18, "female", 99999));
+        employees.add(new Employee(2, "Austin", 18, "male", 99999));
+        employees.add(new Employee(3, "other", 18, "male", 99999));
+        return employees;
+    }
+
+    private Employee getMockEmployeeData() {
+        return new Employee(1, "mandy", 18, "female", 66666);
     }
 }

@@ -29,7 +29,7 @@ public class CompanyController {
     @GetMapping("/{companyId}/employees")
     @ResponseStatus(HttpStatus.OK)
     public List<EmployeeResponse> getAllEmployees(@PathVariable int companyId) {
-        return companyService.getAllEmployeeOfCompany(companyId);
+        return companyService.getAllEmployeeByCompanyId(companyId);
     }
 
     @GetMapping

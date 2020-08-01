@@ -1,7 +1,7 @@
 package com.thoughtworks.springbootemployee.common;
 
 public enum ExceptionMessage {
-    ILLEGALOPRATION("Illegal Operation!"),
+    ILLEGAL_OPERATION("Illegal Operation!"),
     NO_SUCH_DATA("No Such Data!"),
     IllegalArgumentException("Illegal argument!");
 
