@@ -1,7 +1,5 @@
 package com.thoughtworks.springbootemployee.dto;
 
-import javax.persistence.Id;
-
 public class EmployeeRequest {
     private Integer id;
     private String name;

@@ -4,7 +4,6 @@ import com.thoughtworks.springbootemployee.dto.CompanyRequest;
 import com.thoughtworks.springbootemployee.dto.CompanyResponse;
 import com.thoughtworks.springbootemployee.dto.EmployeeResponse;
 import com.thoughtworks.springbootemployee.model.Company;
-import com.thoughtworks.springbootemployee.model.Employee;
 import com.thoughtworks.springbootemployee.service.CompanyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -29,13 +28,13 @@ public class CompanyController {
 
     @GetMapping("/{companyId}/employees")
     @ResponseStatus(HttpStatus.OK)
-    public List<Employee> getAllEmployees(@PathVariable int companyId) {
+    public List<EmployeeResponse> getAllEmployees(@PathVariable int companyId) {
         return companyService.getAllEmployeeOfCompany(companyId);
     }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<Company> getAllCompanies() {
+    public List<CompanyResponse> getAllCompanies() {
         return companyService.getAllCompanies();
     }
 

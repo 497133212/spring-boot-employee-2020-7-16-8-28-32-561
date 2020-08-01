@@ -9,6 +9,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/employees")
 public class EmployeeController {
@@ -16,13 +18,23 @@ public class EmployeeController {
     EmployeeService employeeService;
 
     @GetMapping
-    public Page<Employee> getEmployees(@RequestParam(required = false, defaultValue = "0") int page, @RequestParam(required = false, defaultValue = "0") int pageSize, @RequestParam(required = false, defaultValue = "0") String gender) {
-        return employeeService.getAllEmployees(page, pageSize);
+    public List<EmployeeResponse> getEmployees() {
+        return employeeService.getAllEmployees();
+    }
+
+    @GetMapping(params = {"page", "pageSize"})
+    public Page<Employee> getEmployees(@RequestParam int page, @RequestParam int pageSize) {
+        return employeeService.getPageEmployees(page, pageSize);
+    }
+
+    @GetMapping(params = {"gender"})
+    public List<EmployeeResponse> getEmployees(@RequestParam String gender) {
+        return employeeService.getEmployeesByGender(gender);
     }
 
     @GetMapping("/{employeeId}")
     @ResponseStatus(HttpStatus.OK)
-    public Employee getEmployeeById(@PathVariable int employeeId) {
+    public EmployeeResponse getEmployeeById(@PathVariable int employeeId) {
         return employeeService.getEmployeeById(employeeId);
     }
 

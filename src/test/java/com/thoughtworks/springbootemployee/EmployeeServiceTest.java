@@ -1,6 +1,9 @@
 package com.thoughtworks.springbootemployee;
 
 import com.thoughtworks.springbootemployee.dao.EmployeeRepository;
+import com.thoughtworks.springbootemployee.dto.EmployeeRequest;
+import com.thoughtworks.springbootemployee.dto.EmployeeResponse;
+import com.thoughtworks.springbootemployee.mapper.EmployeeMapper;
 import com.thoughtworks.springbootemployee.model.Employee;
 import com.thoughtworks.springbootemployee.service.EmployeeService;
 import org.junit.jupiter.api.Test;
@@ -18,7 +21,8 @@ import static org.mockito.Mockito.*;
 
 public class EmployeeServiceTest {
     EmployeeRepository mockedEmployeeRepository = mock(EmployeeRepository.class);
-    EmployeeService employeeService = new EmployeeService(mockedEmployeeRepository);
+    EmployeeMapper employeeMapper = new EmployeeMapper();
+    EmployeeService employeeService = new EmployeeService(mockedEmployeeRepository,employeeMapper);
 
     @Test
     void should_return_employees_list_when_getAllEmployees() {
@@ -27,7 +31,7 @@ public class EmployeeServiceTest {
         employees.add(new Employee(1, "mandy", 18, "female",99999));
         employees.add(new Employee(2, "Austin", 18, "male",99999));
         given(mockedEmployeeRepository.findAll()).willReturn(employees);
-        List<Employee> actualEmployees = employeeService.findAllEmployees();
+        List<EmployeeResponse> actualEmployees = employeeService.getAllEmployees();
         //then
         assertEquals(2, actualEmployees.size());
     }
@@ -37,7 +41,7 @@ public class EmployeeServiceTest {
         Employee employee = new Employee(1, "mandy", 18, "female",99999);
         given(mockedEmployeeRepository.findById(1)).willReturn(Optional.of(employee));
         //when
-        Employee actualEmploy = employeeService.getEmployeeById(1);
+        EmployeeResponse actualEmploy = employeeService.getEmployeeById(1);
         //then
         assertEquals(Optional.of(employee).get().getId(), actualEmploy.getId());
     }
@@ -50,7 +54,7 @@ public class EmployeeServiceTest {
         employees.add(new Employee(2, "Austin", 18, "male", 99999));
         given(mockedEmployeeRepository.findAll(PageRequest.of(1, 2))).willReturn(new PageImpl<Employee>(employees));
         //when
-        Page<Employee> actualEmployees = employeeService.getAllEmployees(1, 2);
+        Page<Employee> actualEmployees = employeeService.getPageEmployees(1, 2);
         //then
         assertEquals(new PageImpl<Employee>(employees), actualEmployees);
     }
@@ -63,7 +67,7 @@ public class EmployeeServiceTest {
         employees.add(new Employee(3, "other", 18, "male", 99999));
         given(mockedEmployeeRepository.findAllByGender("male")).willReturn(employees);
         //when
-        List<Employee> actualEmployees = employeeService.getEmployeeByGender("male");
+        List<EmployeeResponse> actualEmployees = employeeService.getEmployeesByGender("male");
         //then
         assertEquals(employees, actualEmployees);
     }
@@ -71,9 +75,10 @@ public class EmployeeServiceTest {
     void should_return_employ_when_add_employee_given_employee() {
         //given
         Employee employee = new Employee(1, "mandy", 18, "female", 99999,1);
+        EmployeeRequest request = new EmployeeRequest(1, "mandy", 18, "female", 99999,1);
         given(mockedEmployeeRepository.save(employee)).willReturn(employee);
         //when
-        Employee addedEmployee = employeeService.addEmployee(employee);
+        EmployeeResponse addedEmployee = employeeService.addEmployee(request);
         //then
         assertEquals(employee, addedEmployee);
     }
@@ -82,10 +87,11 @@ public class EmployeeServiceTest {
         //given
         Employee employee = new Employee(1, "mandy", 18, "female", 66666);
         Employee updateEmployee = new Employee(1, "mandy", 18, "female", 66666);
+        EmployeeRequest employeeRequest = new EmployeeRequest(1, "mandy", 18, "female", 66666);
         given(mockedEmployeeRepository.findById(1)).willReturn(Optional.of(employee));
         given(mockedEmployeeRepository.save(updateEmployee)).willReturn(updateEmployee);
         //when
-        employeeService.updateEmployee(1, updateEmployee);
+        employeeService.updateEmployee(1, employeeRequest);
         //the
         assertEquals(employee.getId(), updateEmployee.getId());
     }

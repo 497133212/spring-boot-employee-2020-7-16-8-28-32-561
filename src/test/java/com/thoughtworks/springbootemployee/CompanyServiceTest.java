@@ -1,6 +1,10 @@
 package com.thoughtworks.springbootemployee;
 
 import com.thoughtworks.springbootemployee.dao.CompanyRepository;
+import com.thoughtworks.springbootemployee.dto.CompanyResponse;
+import com.thoughtworks.springbootemployee.dto.EmployeeResponse;
+import com.thoughtworks.springbootemployee.mapper.CompanyMapper;
+import com.thoughtworks.springbootemployee.mapper.EmployeeMapper;
 import com.thoughtworks.springbootemployee.model.Company;
 import com.thoughtworks.springbootemployee.model.Employee;
 import com.thoughtworks.springbootemployee.service.CompanyService;
@@ -19,7 +23,9 @@ import static org.mockito.Mockito.mock;
 
 public class CompanyServiceTest {
     CompanyRepository mockedCompanyRepository = mock(CompanyRepository.class);
-    CompanyService companyService = new CompanyService(mockedCompanyRepository, null);
+    CompanyMapper companyMapper = new CompanyMapper();
+    EmployeeMapper employeeMapper = new EmployeeMapper();
+    CompanyService companyService = new CompanyService(mockedCompanyRepository, companyMapper, employeeMapper);
 
 
     @Test
@@ -29,7 +35,7 @@ public class CompanyServiceTest {
         companies.add(new Company(1, "alibaba", 100, null));
         companies.add(new Company(2, "alibaba", 100, null));
         given(mockedCompanyRepository.findAll()).willReturn(companies);
-        List<Company> actualCompanies = companyService.findAllCompanies();
+        List<CompanyResponse> actualCompanies = companyService.getAllCompanies();
         //then
         assertEquals(2, actualCompanies.size());
     }
@@ -41,7 +47,7 @@ public class CompanyServiceTest {
         given(mockedCompanyRepository.findById(1)).willReturn(Optional.of(company));
 
         //when
-        Company actualCompany = companyService.getCompanyById(1);
+        CompanyResponse actualCompany = companyService.getCompanyById(1);
         //then
         assertEquals(Optional.of(company).get().getId(), actualCompany.getId());
 
@@ -56,7 +62,7 @@ public class CompanyServiceTest {
         Company company = new Company(1, "alibaba", 100, employees);
         given(mockedCompanyRepository.findById(1)).willReturn(Optional.of(company));
         //when
-        List<Employee> actualEmployees = companyService.getAllEmployeeOfCompany(1);
+        List<EmployeeResponse> actualEmployees = companyService.getAllEmployeeOfCompany(1);
         //then
         assertEquals(company.getEmployees(), actualEmployees);
 
