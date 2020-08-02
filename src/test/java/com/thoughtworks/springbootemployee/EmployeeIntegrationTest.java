@@ -1,5 +1,6 @@
 package com.thoughtworks.springbootemployee;
 
+import com.alibaba.fastjson.JSON;
 import com.thoughtworks.springbootemployee.dao.CompanyRepository;
 import com.thoughtworks.springbootemployee.dao.EmployeeRepository;
 import com.thoughtworks.springbootemployee.model.Company;
@@ -9,12 +10,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.assertj.core.util.Lists.emptyList;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -74,6 +78,23 @@ public class EmployeeIntegrationTest {
                 .param("pageSize", "5"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.numberOfElements").value(5));
+    }
+
+    @Test
+    void should_return_employee_when_add_employee_given_employee_request() throws Exception {
+        //given
+        Employee employee = employeeRepository.save(new Employee(1, "Lin", 18, "male", 3000.0, null));
+        String json = JSON.toJSONString(employee);
+        //when
+        mockMvc.perform(post("/employees")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.data.id").value(employee.getId()))
+                .andExpect(jsonPath("$.data.name").value(employee.getName()))
+                .andExpect(jsonPath("$.data.age").value(employee.getAge()))
+                .andExpect(jsonPath("$.data.gender").value(employee.getGender()));
+        //then
     }
 
 
