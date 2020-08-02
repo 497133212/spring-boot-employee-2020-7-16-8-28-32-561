@@ -124,6 +124,21 @@ public class EmployeeIntegrationTest {
         assertFalse(employeeRepository.findById(employee.getId()).isPresent());
     }
 
+    @Test
+    void should_return_empanees_list_when_get_employees_by_gender_given_gender() throws Exception {
+        //given
+        List<Employee> employees = employeeRepository.saveAll(getMockEmployees());
+        //when
+        mockMvc.perform(get("/employees").param("gender", "Male"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.length()").value(7))
+                .andExpect(jsonPath("$.data[0].id").value(employees.get(0).getId()))
+                .andExpect(jsonPath("$.data[0].name").value(employees.get(0).getName()))
+                .andExpect(jsonPath("$.data[0].age").value(employees.get(0).getAge()))
+                .andExpect(jsonPath("$.data[0].gender").value(employees.get(0).getGender()));
+        //then
+    }
+
     private List<Employee> getMockEmployees() {
         List<Employee> employees = new ArrayList<>();
         employees.add(new Employee(1, "xiaoyi", 18, "Male", 30000.0, null));
