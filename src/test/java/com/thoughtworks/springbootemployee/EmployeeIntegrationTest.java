@@ -3,7 +3,6 @@ package com.thoughtworks.springbootemployee;
 import com.alibaba.fastjson.JSON;
 import com.thoughtworks.springbootemployee.dao.CompanyRepository;
 import com.thoughtworks.springbootemployee.dao.EmployeeRepository;
-import com.thoughtworks.springbootemployee.model.Company;
 import com.thoughtworks.springbootemployee.model.Employee;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,7 +13,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -55,7 +53,7 @@ public class EmployeeIntegrationTest {
     }
 
     @Test
-    void should_return_empanees_when_get_employees_by_id_given_employee_id() throws Exception {
+    void should_return_employees_when_get_employees_by_id_given_employee_id() throws Exception {
         //given
         List<Employee> employees = employeeRepository.saveAll(getMockEmployees());
         //when
@@ -71,7 +69,7 @@ public class EmployeeIntegrationTest {
     @Test
     void should_return_employees_list_when_get_all_employees_after_Pagination_given_page_and_pageSize() throws Exception {
         //given
-        List<Employee> employees = employeeRepository.saveAll(getMockEmployees());
+        employeeRepository.saveAll(getMockEmployees());
         //when
         mockMvc.perform(get("/employees")
                 .param("page", "1")
@@ -101,7 +99,7 @@ public class EmployeeIntegrationTest {
     void should_return_employee_when_update_employee_given_employee_request() throws Exception {
         //given
         Employee employee = employeeRepository.save(new Employee(1, "Lin", 18, "male", 3000.0, null));
-        Employee updateEmployee = new Employee(employee.getId(), "Ming", 20, "female",4000.0, null);
+        Employee updateEmployee = new Employee(employee.getId(), "Ming", 20, "female", 4000.0, null);
         String json = JSON.toJSONString(updateEmployee);
         //when
         mockMvc.perform(put("/employees/" + employee.getId()).contentType(MediaType.APPLICATION_JSON)

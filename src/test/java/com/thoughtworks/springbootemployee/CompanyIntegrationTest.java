@@ -76,15 +76,14 @@ public class CompanyIntegrationTest {
 
     @Test
     void should_return_company_when_get_company_by_id_given_company_id() throws Exception {
-        List<Company> companies = companyRepository.saveAll(getMockCompanies());
         //given
+        List<Company> companies = companyRepository.saveAll(getMockCompanies());
+        //when
         mockMvc.perform(get("/companies/" + companies.get(0).getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.id").value(companies.get(0).getId()))
                 .andExpect(jsonPath("$.data.employeesNumber").value(companies.get(0).getEmployeesNumber()))
                 .andExpect(jsonPath("$.data.companyName").value(companies.get(0).getCompanyName()));
-        //when
-
         //then
 
     }
@@ -110,13 +109,14 @@ public class CompanyIntegrationTest {
     void should_return_company_when_update_company_given_company() throws Exception {
         //given
         Company company = companyRepository.save(new Company(1, "alibaba2", 100, Collections.emptyList()));
+        Company updateCompany = new Company(company.getId(), "xiaomi" , 200 , Collections.emptyList());
         String json = JSON.toJSONString(company);
         //when
         mockMvc.perform(put("/companies/" + company.getId()).contentType(MediaType.APPLICATION_JSON)
                 .content(json))
-                .andExpect(jsonPath("$.data.id").value(company.getId()))
-                .andExpect(jsonPath("$.data.employeesNumber").value(200))
-                .andExpect(jsonPath("$.data.companyName").value("alibaba3"));
+                .andExpect(jsonPath("$.data.id").value(updateCompany.getId()))
+                .andExpect(jsonPath("$.data.employeesNumber").value(updateCompany.getEmployeesNumber()))
+                .andExpect(jsonPath("$.data.companyName").value(updateCompany.getCompanyName()));
         //then
     }
 
@@ -133,7 +133,7 @@ public class CompanyIntegrationTest {
     @Test
     void should_return_company_list_when_get_all_company_after_Pagination_given_page_and_pageSize() throws Exception {
         //given
-        List<Company> companies = companyRepository.saveAll(getMockCompanies());
+        companyRepository.saveAll(getMockCompanies());
         //when
         mockMvc.perform(get("/companies")
                 .param("page", "1")
