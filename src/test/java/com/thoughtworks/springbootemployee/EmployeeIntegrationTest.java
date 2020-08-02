@@ -14,11 +14,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import static org.assertj.core.util.Lists.emptyList;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -97,7 +96,21 @@ public class EmployeeIntegrationTest {
         //then
     }
 
-
+    @Test
+    void should_return_employee_when_update_employee_given_employee_request() throws Exception {
+        //given
+        Employee employee = employeeRepository.save(new Employee(1, "Lin", 18, "male", 3000.0, null));
+        Employee updateEmployee = new Employee(employee.getId(), "Ming", 20, "female",4000.0, null);
+        String json = JSON.toJSONString(updateEmployee);
+        //when
+        mockMvc.perform(put("/employees/" + employee.getId()).contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+                .andExpect(jsonPath("$.data.id").value(updateEmployee.getId()))
+                .andExpect(jsonPath("$.data.name").value(updateEmployee.getName()))
+                .andExpect(jsonPath("$.data.age").value(updateEmployee.getAge()))
+                .andExpect(jsonPath("$.data.gender").value(updateEmployee.getGender()));
+        //then
+    }
 
     private List<Employee> getMockEmployees() {
         List<Employee> employees = new ArrayList<>();
