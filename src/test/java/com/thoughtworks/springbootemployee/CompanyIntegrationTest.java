@@ -140,7 +140,6 @@ public class CompanyIntegrationTest {
                 .param("pageSize", "5"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.numberOfElements").value(5));
-
     }
 
     private List<Company> getMockCompanies() {
