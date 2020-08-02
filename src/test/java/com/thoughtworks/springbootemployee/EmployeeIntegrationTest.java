@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -110,6 +111,17 @@ public class EmployeeIntegrationTest {
                 .andExpect(jsonPath("$.data.age").value(updateEmployee.getAge()))
                 .andExpect(jsonPath("$.data.gender").value(updateEmployee.getGender()));
         //then
+    }
+
+    @Test
+    void should_when_delete_employee_by_id_given_employee_id() throws Exception {
+        //given
+        Employee employee = employeeRepository.save(new Employee(1, "Lin", 18, "male", 3000.0, null));
+        //when
+        mockMvc.perform(delete("/employees/" + employee.getId()))
+                .andExpect(status().isOk());
+        //then
+        assertFalse(employeeRepository.findById(employee.getId()).isPresent());
     }
 
     private List<Employee> getMockEmployees() {
